@@ -9,7 +9,7 @@ Contém o **roteiro do apresentador (cola)** do Trabalho 2 de Segurança de Sist
 - **Cola (roteiro):** página inicial do Pages deste repositório.
 - **Apresentação (ensaio):** `slides.html`.
 
-Botões da cola: *Ativar rota curta (30 min)*, *Imprimir* e *Abrir apresentação*. Âncoras `#slide-N` abrem direto no roteiro de cada slide.
+Botões da cola: *Imprimir* e *Abrir apresentação*. Âncoras `#slide-N` abrem direto no roteiro de cada slide. O roteiro prevê até 15 minutos e deve ser ensaiado com cronômetro.
 
 ## Estrutura
 

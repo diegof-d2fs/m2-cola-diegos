@@ -39,8 +39,6 @@ function parse(md) {
   return { title, sections };
 }
 
-let shortRoute = false;
-
 function build(data) {
   const intro = data.sections.find(s => s.kind === "intro");
   const body = data.sections.filter(s => s.kind !== "intro");
@@ -69,26 +67,9 @@ function build(data) {
     <nav class="cola-toc cola-no-print" aria-label="Índice do roteiro">${tocHtml}</nav>
     ${sectionsHtml}`;
 
-  applyShort();
-}
-
-function applyShort() {
-  document.querySelectorAll('.cola-section[data-optional="true"]').forEach(s => s.setAttribute("data-hidden", String(shortRoute)));
-  document.querySelectorAll('.cola-toc a[data-hidden]').forEach(a => {
-    if (a.classList.contains("apx")) return;
-    const id = a.getAttribute("href").slice(1);
-    const sec = document.getElementById(id);
-    if (sec && sec.dataset.optional === "true") a.setAttribute("data-hidden", String(shortRoute));
-  });
-  const btn = $("btn-short");
-  btn.dataset.active = String(shortRoute);
-  btn.setAttribute("aria-pressed", String(shortRoute));
-  btn.textContent = shortRoute ? "Desativar rota curta" : "Ativar rota curta (30 min)";
 }
 
 function init() {
-  if (new URLSearchParams(location.search).has("curta")) shortRoute = true;
-  $("btn-short").addEventListener("click", () => { shortRoute = !shortRoute; applyShort(); });
   $("btn-print").addEventListener("click", () => window.print());
 
   fetch("content/cola.md")

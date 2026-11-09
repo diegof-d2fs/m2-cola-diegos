@@ -2,6 +2,8 @@
 
 Apresentação do Trabalho 2 de Segurança de Sistemas Computacionais (UNIVALI, 2026/2). Alvo de **15 minutos**: contexto (2), DFD e fronteiras (3), fluxos e ameaças (7), Top 10 e mitigações (2), lições (1). Comece pelo DFD como fio condutor. Cada integrante conduz o(s) fluxo(s) sob sua responsabilidade. Navegue com as setas; `S` abre o sumário; `F` entra em tela cheia.
 
+Divisão dos fluxos conforme o relatório: **Diego: FX1; Leonardo: FX2; Gustavo: FX3; João Victor: FX4**. Distribuam também abertura, método e fechamento para equilibrar a participação. Os tempos por slide abaixo somam 15 minutos; confirmem em ensaio cronometrado. Cada equipe deve fazer ao menos uma pergunta a outra equipe.
+
 ### Slide 1: Capa
 
 Abertura rápida (15 s). Apresentar a equipe e o objetivo: modelar ameaças do mesmo laboratório da M1, agora **de dentro para fora**, como na fase de projeto. Não é nova exploração: é modelagem.
@@ -12,21 +14,21 @@ Mapa da fala (15 s). Seis blocos: contexto e método, modelo e DFD, os quatro fl
 
 ### Slide 3: Contexto do ambiente
 
-**~2 min.** Responde C1 a C10 de forma enxuta.
+**~1 min.** Responde C1 a C10 de forma enxuta.
 
 - **O sistema:** Juice Shop v20.2.0, SPA Angular + API Node/Express, SQLite e MarsDB, JWT RS256.
-- **Implantação:** imagem fixada por tag e digest, publicada só em `127.0.0.1:3000`, em rede bridge isolada. Conduta: nada apontado para terceiros.
+- **Implantação:** imagem fixada por tag e digest, publicada em `127.0.0.1:3000`, em rede bridge do laboratório. O alcance da bridge depende da configuração. Conduta: nada apontado para terceiros.
 - **Atores e ativos:** visitante, cliente, admin e accounting; contas, credenciais, cesta, pedido e comprovante, com leitura à luz da LGPD.
 
 Fonte: relatório da equipe e documentação do projeto.
 
 ### Slide 4: Método: DFD, STRIDE e DREAD
 
-**~1 min.** As quatro perguntas de Shostack guiam o trabalho. DFD descreve o sistema; STRIDE por elemento identifica o que pode dar errado; DREAD prioriza de 1 a 10 com cada nota justificada. Fechar: cada ameaça liga-se a um requisito **ASVS 5.0**, a um **CWE** e, havendo dado pessoal, ao **art. 46 da LGPD**.
+**~30 s.** As quatro perguntas de Shostack guiam o trabalho. DFD descreve o sistema; STRIDE por elemento identifica o que pode dar errado; DREAD prioriza de 1 a 10 com cada nota justificada. Fechar: cada ameaça liga-se a um requisito **ASVS 5.0**, a um **CWE** e, havendo dado pessoal, ao **art. 46 da LGPD**.
 
 ### Slide 5: Modelo do sistema e fronteiras
 
-**~3 min — o coração da fala.** Percorra o DFD nível 1 da direita: entidades externas, os processos P2 a P6 do mesmo serviço Express, e os armazenamentos D1 a D5. Destaque as três fronteiras de confiança: **TB-01** cliente|servidor, **TB-02** host|contêiner e **TB-03** aplicação|armazenamentos. Mensagem: todo fluxo analisado cruza ao menos uma fronteira — é ali que a confiança muda.
+**~2 min.** Percorra o DFD nível 1: entidades externas, processos P2 a P6 do mesmo serviço Express e armazenamentos D1 a D5. Destaque as três fronteiras de confiança: **TB-01** cliente|servidor, **TB-02** host|contêiner e **TB-03** aplicação|armazenamentos. Retome o diagrama ao apresentar cada fluxo.
 
 ### Slide 6: Os quatro fluxos
 
@@ -34,19 +36,19 @@ Fonte: relatório da equipe e documentação do projeto.
 
 ### Slide 7: FX1 · Login e sessão
 
-**~1 min 45.** Ameaça mais grave do modelo: **T-FX1-02 injeção SQL (DREAD 9,8)** — e-mail concatenado à consulta, entrada anônima vira sessão de administrador (confirmada no T1, V1). Em seguida **T-FX1-04**: o JWT serializa a conta inteira, incluindo o hash **MD5 sem sal**, e não expira (V2). Mitigação: consulta parametrizada, claims restritos e Argon2id.
+**~1 min 30, Diego.** Ameaça mais grave do modelo: **T-FX1-02 injeção SQL (DREAD 9,8)**: e-mail concatenado à consulta, entrada anônima vira sessão de administrador (confirmada no T1, V1). Em seguida, **T-FX1-04**: o JWT serializa a conta, incluindo o hash **MD5 sem sal**. Nos tokens examinados, o campo `exp` estava ausente; a validade temporal em cada rota não foi ensaiada. Mitigação: consulta parametrizada, claims restritos e Argon2id.
 
 ### Slide 8: FX2 · Cadastro e recuperação
 
-**~1 min 45.** **T-FX2-06 (9,0):** o cadastro aceita `role: admin` do cliente (mass assignment) e cria a conta já como administrador — reproduzida ao vivo na M2. **T-FX2-01 (8,8):** pergunta de segurança consultável por e-mail e redefinição no 5º palpite dentro da cota (V7). Mitigação: papel só no servidor e recuperação de uso único.
+**~1 min 30, Leonardo.** **T-FX2-06 (9,0):** o cadastro aceita `role: admin` do cliente (mass assignment) e cria a conta como administrador, reproduzida no laboratório na M2. **T-FX2-01 (8,8):** pergunta consultável por e-mail e redefinição no 5º palpite dentro da cota (V7). Mitigação: papel no servidor e recuperação de uso único.
 
 ### Slide 9: FX3 · Cesta, checkout e pedido
 
-**~1 min 45.** **T-FX3-06 (8,4):** com um JWT válido lê-se a cesta de outra conta (IDOR); sem token, a rota recusa (V3). Reforçar a ideia: reconhecer a sessão não garante a titularidade do objeto. Apoio: comprovante exposto pelo diretório `/ftp/` (V5) e erro verboso (V4). Mitigação: autorização por objeto e servir arquivos só via API.
+**~1 min 30, Gustavo.** **T-FX3-06 (8,4):** com um JWT válido lê-se a cesta de outra conta (IDOR); sem token, a rota recusa (V3 e reprodução M2). Reconhecer a sessão não garante a titularidade. V5 confirmou listagem de `/ftp/` e download de exemplo; acesso ao comprovante de terceiro permanece hipótese. Checkout com cesta alheia também não foi confirmado. Mitigação: autorização por objeto e API autorizada para arquivos.
 
 ### Slide 10: FX4 · Administração e contabilidade
 
-**~1 min 45.** Função privilegiada sobre vários titulares. **T-FX4-04 (8,6):** consulta de usuários sem verificação de papel; **T-FX4-06 (8,2):** exclusão de feedback sem exigir admin. Verificação de função desigual entre rotas. Mitigação: matriz de papéis no servidor, negar por padrão e registrar.
+**~1 min 30, João Victor.** **T-FX4-04 (8,6):** na M2 uma conta customer consultou usuários por HTTP e recebeu 200. A imagem do painel mostra uma sessão administrativa, não a chamada customer. **T-FX4-06 (8,2):** a hipótese de exclusão indevida de feedback foi identificada no código, mas não foi testada. Mitigação: matriz de papéis no servidor, negar por padrão e registrar.
 
 ### Slide 11: Top 10 por DREAD
 
@@ -58,7 +60,7 @@ Fonte: relatório da equipe e documentação do projeto.
 
 ### Slide 13: Validação no laboratório
 
-**~1 min.** Diferencial da entrega: a execução complementar **foi realizada** em 08/11/2026 na mesma imagem (digest conferido). Reproduzimos ao vivo a injeção no login, o hash no JWT, o **cadastro role:admin** (T-FX2-06, antes só plausível), a leitura de cesta alheia, a listagem `/ftp/` e a cota do reset. O motor de desafios do próprio Juice Shop marcou *Login Admin, Admin Registration e View Basket* como resolvidos.
+**~1 min.** A execução complementar foi realizada em 08/11/2026 na mesma imagem. Foram reproduzidos a injeção no login, o hash no JWT, o **cadastro role:admin**, a leitura de cesta alheia, a consulta de usuários por customer e a listagem `/ftp/`. Os ensaios tiveram baixo volume: não mediram esgotamento, concorrência nem a validade temporal por rota. Não afirmar que todas as hipóteses foram testadas.
 
 ### Slide 14: Conclusão e lições
 
@@ -66,7 +68,7 @@ Fonte: relatório da equipe e documentação do projeto.
 
 ### Slide 15: Obrigado
 
-Encerramento (15 s). Agradecer, indicar o repositório com relatório, modelo e scripts, e abrir para perguntas.
+Encerramento (30 s). Agradecer, indicar o repositório com relatório, modelo e scripts, e abrir para perguntas.
 
 ## Apêndice · Perguntas prováveis (Q&A)
 
@@ -77,7 +79,7 @@ O roteiro permite ambos; adotamos DREAD pela simplicidade e aplicamos a **mesma*
 É uma aplicação deliberadamente vulnerável, fixada na tag v20.2.0 por digest para reprodutibilidade. O objetivo é modelar, não corrigir o upstream.
 
 #### Qual a diferença entre "Confirmada no T1" e "Plausível"?
-Confirmada = comportamento observado em requisição/resposta/captura da M1. Plausível = hipótese fundamentada em código, documentação ou teste upstream, sem reprodução pela equipe. Alguns cenários plausíveis foram reproduzidos na M2 (ex.: T-FX2-06).
+Confirmada no T1 = comportamento observado nas evidências da M1. Plausível na análise inicial = hipótese baseada em código, documentação ou teste upstream. Algumas hipóteses iniciais foram reproduzidas na M2, como T-FX2-06 e T-FX4-04; outras permanecem sem ensaio. Não confundir as sete ameaças apoiadas em achados da M1 com uma contagem atualizada de todas as confirmações.
 
 #### Como a LGPD entra no modelo?
 Classificamos dados pessoais (C5) e ligamos mitigações ao art. 46 (medidas técnicas) e ao princípio da necessidade (art. 6º), por exemplo verificar o titular antes de devolver um comprovante.
