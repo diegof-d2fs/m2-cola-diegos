@@ -1,8 +1,8 @@
-# Cola do apresentador (privado) — Trabalho 2
+# Cola do apresentador — Trabalho 2 (não divulgar)
 
-Repositório **privado**, só para a equipe. Contém o **roteiro do apresentador (cola)** do Trabalho 2 de Segurança de Sistemas Computacionais, renderizado via GitHub Pages.
+Contém o **roteiro do apresentador (cola)** do Trabalho 2 de Segurança de Sistemas Computacionais, renderizado via GitHub Pages.
 
-> ⚠️ Mantenha **privado**. Esta cola não deve ser vista pelo professor nem entregue. O material público (slides + relatório + modelo) está em `m2-seg-system-diegos`.
+> ⚠️ **Não divulgue a URL.** O plano Free não serve Pages a partir de repositório privado, então este repositório é público com `noindex` + `robots.txt` (fora de buscas e sem links apontando para ele). A cola não deve ser entregue ao professor. O material público oficial (slides + relatório + modelo) está em `m2-seg-system-diegos`.
 
 ## Acesso (GitHub Pages)
 
